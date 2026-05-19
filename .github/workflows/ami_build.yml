@@ -4,7 +4,7 @@ on:
       - main
     paths:
       - "packer/**"
-    workflow_dispatch
+  workflow_dispatch
 jobs:
   packer_build:
     runs-on: ubuntu-latest
