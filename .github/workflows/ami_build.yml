@@ -1,0 +1,41 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "packer/**"
+    workflow_dispatch
+jobs:
+  packer_build:
+    runs-on: ubuntu-latest
+    name: build
+    steps:
+      - name: check repo
+        uses: actions/checkout@v4
+
+      - name: setup packer
+        uses: hashicorp/setup-packer@main
+        with:
+          version: "latest"
+
+      - name: aws config
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: packer init build
+        run: |
+         packer init .
+         packer build .
+        working-directory: ./packer
+
+      - name: setup terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: terraform init
+        run: |
+          terraform init
+          terraform apply --auto-approve
+        working-directory: ./terraform
